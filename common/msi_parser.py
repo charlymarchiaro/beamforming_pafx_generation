@@ -1,10 +1,8 @@
-import json
 import re
-import sys
 
 from .pattern_gains_parser import PatternGainsParser
 
-from .msi_data import PapPatternData, MsiData
+from .msi_data import MsiData
 
 
 class MsiParser:
@@ -91,7 +89,8 @@ class MsiParser:
 
         return data
 
-    def parse_msi_line(self, line: str):
+    @staticmethod
+    def parse_msi_line(line: str):
         r = re.findall('([^ ]+?)[ \t]+?(.*)', line)
         if len(r) > 0:
             key = r[0][0]
@@ -106,14 +105,16 @@ class MsiParser:
             'value': value,
         }
 
-    def get_boresight_gain(self, value):
+    @staticmethod
+    def get_boresight_gain(value):
         parts = value.split(' ')
         gain = float(parts[0])
         unit = parts[1].upper() if len(parts) > 0 else ''
         gain = gain + 2.15 if unit == 'DBD' else gain
         return gain
 
-    def get_header_pattern_width(self, orientation: str, msi_data) -> float | None:
+    @staticmethod
+    def get_header_pattern_width(orientation: str, msi_data) -> float | None:
         header_key = 'H_WIDTH' if orientation == 'horizontal' else 'V_WIDTH'
         header = msi_data['header']
         if header_key in header:

@@ -8,6 +8,7 @@ from .pattern_payload_param_extractor import PatternPayloadParamExtractor
 
 class BeamformingAntennaGenerator:
     src_files = []
+    patterns = []
     parser = None
 
     def __init__(self, params):
@@ -64,10 +65,11 @@ class BeamformingAntennaGenerator:
                 'type': self.extract_param(pattern_type_extractor, src_file, payload),
             }
             patterns.append(pattern)
-            print(pattern)
 
+        self.patterns = patterns
+
+    @staticmethod
     def extract_param(
-            self,
             extractor: PatternNameParamExtractor | PatternPayloadParamExtractor,
             src_file: str,
             payload: MsiData,
