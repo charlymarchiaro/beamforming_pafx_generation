@@ -8,6 +8,17 @@ Este módulo permite generar un modelo de antena con soporte de beamforming usan
 
 <img src="assets/fig1.png">
 
+### Instalación
+
+1. Instalar un intérprete de Python 3.10 o superior.
+2. Ejecutar en el directorio raíz:
+
+```
+$ pip install -r requirements.txt
+```
+
+3. Se requiere además contar con un IDE que soporte Jupyter Notebooks.
+
 ### Datos de input
 
 Se requieren como inputs:
