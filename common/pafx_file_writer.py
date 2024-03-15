@@ -203,23 +203,28 @@ class PafxFileWriter:
 
         # group data by scenario > virtual port > virtual band
         scenarios = {}
-        for pattern_se in patterns:
-            scenario = pattern_se['scenario']
-            v_port_name = pattern_se['v_port_name']
-            min_freq = pattern_se['min_freq']
-            max_freq = pattern_se['max_freq']
+        for pattern in patterns:
+            scenario = pattern['scenario']
+            v_port_name = pattern['v_port_name']
+            min_freq = pattern['min_freq']
+            max_freq = pattern['max_freq']
             v_band_name = str(min_freq) + '-' + str(max_freq)
-            pattern_type = pattern_se['pattern_type']
-            pattern_name = pattern_se['name']
+            pattern_type = pattern['pattern_type']
+            pattern_name = pattern['name']
+
+            # if any extracted param is missing, the pattern cannot yet be assigned;>
+            # it must be assigned considering selected params in the next loop
+            if scenario is None or v_port_name is None:
+                continue
 
             if scenario not in scenarios:
                 scenarios[scenario] = {
                     'uid': self.get_uid(),
                     'name': scenario,
-                    'horiz_number_of_elements': pattern_se['horiz_number_of_elements'],
-                    'horiz_sep_dist_cm': pattern_se['horiz_sep_dist_cm'],
-                    'vert_number_of_elements': pattern_se['vert_number_of_elements'],
-                    'vert_sep_dist_cm': pattern_se['vert_sep_dist_cm'],
+                    'horiz_number_of_elements': pattern['horiz_number_of_elements'],
+                    'horiz_sep_dist_cm': pattern['horiz_sep_dist_cm'],
+                    'vert_number_of_elements': pattern['vert_number_of_elements'],
+                    'vert_sep_dist_cm': pattern['vert_sep_dist_cm'],
                     'v_ports': {},
                     'is_beamswitching': False,
                 }
@@ -227,15 +232,15 @@ class PafxFileWriter:
                 scenarios[scenario]['v_ports'][v_port_name] = {
                     'uid': self.get_uid(),
                     'name': v_port_name,
-                    'number_of_ports': pattern_se['v_port_number_of_ports'],
-                    'polarization': pattern_se['polarization'],
-                    'polarization_type': pattern_se['polarization_type'],
+                    'number_of_ports': pattern['v_port_number_of_ports'],
+                    'polarization': pattern['polarization'],
+                    'polarization_type': pattern['polarization_type'],
                     'v_bands': {},
                 }
             if v_band_name not in scenarios[scenario]['v_ports'][v_port_name]['v_bands']:
                 scenarios[scenario]['v_ports'][v_port_name]['v_bands'][v_band_name] = {
-                    'min_freq': pattern_se['min_freq'],
-                    'max_freq': pattern_se['max_freq'],
+                    'min_freq': pattern['min_freq'],
+                    'max_freq': pattern['max_freq'],
                     'supp_elec_tilt': params['supp_elec_tilt'],
                     'supp_elec_azimuth': params['supp_elec_azimuth'],
                     'supp_elec_beamwidth': params['supp_elec_beamwidth'],
@@ -252,6 +257,51 @@ class PafxFileWriter:
                 v_band['broadcast_patterns'].append(pattern_name)
             if pattern_type == PATTERN_TYPE__BEAMFORMING_ELEMENT:
                 v_band['beamforming_element_patterns'].append(pattern_name)
+
+        # assign selected params
+        for pattern in patterns:
+            extracted_scenario = pattern['scenario']
+            extracted_v_port_name = pattern['v_port_name']
+            selected_scenarios = pattern['selected_scenarios']
+            selected_v_port_names = pattern['selected_v_port_names']
+
+            min_freq = pattern['min_freq']
+            max_freq = pattern['max_freq']
+            v_band_name = str(min_freq) + '-' + str(max_freq)
+            pattern_type = pattern['pattern_type']
+            pattern_name = pattern['name']
+
+            if len(selected_scenarios) == 0 and len(selected_v_port_names) == 0:
+                # No selected params --> ignore
+                continue
+
+            pattern_scenarios = selected_scenarios + (
+                [extracted_scenario] if extracted_scenario is not None else []
+            )
+            pattern_v_port_names = selected_v_port_names + (
+                [extracted_v_port_name] if extracted_v_port_name is not None else []
+            )
+
+            for scenario in pattern_scenarios:
+                if not scenario in scenarios:
+                    continue
+                for v_port_name in pattern_v_port_names:
+                    if not v_port_name in scenarios[scenario]['v_ports']:
+                        continue
+
+                    v_band = scenarios[scenario]['v_ports'][v_port_name]['v_bands'][v_band_name]
+
+                    if (
+                            pattern_type == PATTERN_TYPE__BROADCAST
+                            and pattern_name not in v_band['broadcast_patterns']
+                    ):
+                        v_band['broadcast_patterns'].append(pattern_name)
+
+                    if (
+                            pattern_type == PATTERN_TYPE__BEAMFORMING_ELEMENT
+                            and pattern_name not in v_band['beamforming_element_patterns']
+                    ):
+                        v_band['beamforming_element_patterns'].append(pattern_name)
 
         # log assignments
         print()
@@ -386,10 +436,13 @@ class PafxFileWriter:
             print('--> ' + os.path.basename(output_path))
             print('===============================================================')
 
-        except:
+        except Exception as e:
             print('')
             print('===============================================================')
             print('[Error] Could not generate .pafx file')
+            print('')
+            print('Details:')
+            print(e)
             print('===============================================================')
 
     def get_uid(self) -> str:

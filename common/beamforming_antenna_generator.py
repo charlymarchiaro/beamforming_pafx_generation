@@ -6,6 +6,7 @@ from .msi_data import MsiData
 from .msi_parser import MsiParser
 from .pattern_name_param_extractor import PatternNameParamExtractor
 from .pattern_payload_param_extractor import PatternPayloadParamExtractor
+from .pattern_name_param_selector import PatternNameParamSelector
 from .pafx_file_writer import PafxFileWriter
 
 
@@ -39,6 +40,7 @@ class BeamformingAntennaGenerator:
     def process_patterns(self):
         src_folder = self.params['src_folder']
 
+        # extractors
         pattern_name_extractor = self.params['pattern_name_extractor']
         scenario_extractor = self.params['scenario_extractor']
         v_port_name_extractor = self.params['v_port_name_extractor']
@@ -55,7 +57,18 @@ class BeamformingAntennaGenerator:
         vert_sep_dist_cm_extractor = self.params['vert_sep_dist_cm_extractor']
         v_port_number_of_ports_extractor = self.params['v_port_number_of_ports_extractor']
 
+        # selectors
+        scenario_selector: PatternNameParamSelector | None = self.params['scenario_selector']
+        v_port_name_selector: PatternNameParamSelector | None = self.params['v_port_name_selector']
+
         patterns = []
+
+        # keep a list of unique extracted scenarios and v_port_names to be able
+        # to execute selectors in the next loop
+        extracted_scenarios = set()
+        extracted_v_port_names = set()
+
+        # extract parameters
         for src_file in self.src_files:
             src_file_basename = os.path.basename(src_file)
             output_file_basename = self.get_pattern_output_file_basename(
@@ -94,7 +107,30 @@ class BeamformingAntennaGenerator:
                 'horiz_pap_pattern': payload.horiz_pap_pattern,
                 'vert_pap_pattern': payload.vert_pap_pattern,
             }
+
+            # add selectable params values to lists
+            # scenario
+            if pattern['scenario'] is not None:
+                extracted_scenarios.add(pattern['scenario'])
+            # v_port_name
+            if pattern['v_port_name'] is not None:
+                extracted_v_port_names.add(pattern['v_port_name'])
+
             patterns.append(pattern)
+
+        # execute selectors
+        for pattern in patterns:
+            # scenario
+            pattern['selected_scenarios'] = scenario_selector.select(
+                pattern['src_file'],
+                list(extracted_scenarios),
+            ) if scenario_selector is not None else []
+            # v_port_name
+            pattern['selected_v_port_names'] = v_port_name_selector.select(
+                pattern['src_file'],
+                list(extracted_v_port_names),
+            ) if v_port_name_selector is not None else []
+
         self.patterns = patterns
 
     def list_extracted_tags(self, detailed=False, full_path=False, log=True):
@@ -113,8 +149,14 @@ class BeamformingAntennaGenerator:
         for pattern in self.patterns:
             if detailed:
                 value = pattern['src_file'] if full_path else os.path.basename(pattern['src_file'])
-                self.push_dict_item(pattern['scenario'], scenario, value)
-                self.push_dict_item(pattern['v_port_name'], v_port_name, value)
+                # scenario
+                for pattern_scenario in [pattern['scenario']] + pattern['selected_scenarios']:
+                    if pattern_scenario is not None:
+                        self.push_dict_item(pattern_scenario, scenario, value)
+                # v_port_name
+                for pattern_v_port_name in [pattern['v_port_name']] + pattern['selected_v_port_names']:
+                    if pattern_v_port_name is not None:
+                        self.push_dict_item(pattern_v_port_name, v_port_name, value)
                 self.push_dict_item(pattern['pattern_type'], pattern_type, value)
                 self.push_dict_item(str(pattern['min_freq']) + '-' + str(pattern['max_freq']), freq_band, value)
                 self.push_dict_item(pattern['electrical_tilt'], electrical_tilt, value)
@@ -126,8 +168,14 @@ class BeamformingAntennaGenerator:
                 self.push_dict_item(pattern['vert_number_of_elements'], vert_number_of_elements, value)
                 self.push_dict_item(pattern['vert_sep_dist_cm'], vert_sep_dist_cm, value)
             else:
-                self.increment_dict_item(pattern['scenario'], scenario)
-                self.increment_dict_item(pattern['v_port_name'], v_port_name)
+                # scenario
+                for pattern_scenario in [pattern['scenario']] + pattern['selected_scenarios']:
+                    if pattern_scenario is not None:
+                        self.increment_dict_item(pattern_scenario, scenario)
+                # v_port_name
+                for pattern_v_port_name in [pattern['v_port_name']] + pattern['selected_v_port_names']:
+                    if pattern_v_port_name is not None:
+                        self.increment_dict_item(pattern_v_port_name, v_port_name)
                 self.increment_dict_item(pattern['pattern_type'], pattern_type)
                 self.increment_dict_item(str(pattern['min_freq']) + '-' + str(pattern['max_freq']), freq_band)
                 self.increment_dict_item(pattern['electrical_tilt'], electrical_tilt)
@@ -180,7 +228,7 @@ class BeamformingAntennaGenerator:
             extractor: PatternNameParamExtractor | PatternPayloadParamExtractor,
             src_file: str,
             payload: MsiData,
-    ):
+    ) -> str | int | float | None:
         if isinstance(extractor, PatternNameParamExtractor):
             return extractor.extract(src_file)
 

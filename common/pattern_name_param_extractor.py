@@ -57,7 +57,7 @@ class PatternNameParamExtractor:
             else:
                 param = proc_pattern_name
         except:
-            print('[ERROR] Error executing regular expression: ' + self.extract_re + ', pattern: ' + proc_pattern_name)
+            print('[NOTICE] Could not execute regular expression: ' + self.extract_re + ', pattern: ' + proc_pattern_name)
             return None
 
         try:
