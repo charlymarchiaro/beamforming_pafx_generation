@@ -218,10 +218,14 @@ class PatternGainsParser:
             if float(angle) == effective_boresight:
                 max_gain_index = i
                 min_gain_index = (i + round(len(angles) / 2)) % len(angles)
-        front_to_back_ratio_db = round(gains[max_gain_index] - gains[min_gain_index])
+        front_to_back_ratio_db = gains[max_gain_index] - gains[min_gain_index]
+
+        boresight_deg = round(effective_boresight)
+        if boresight_deg > 180:
+            boresight_deg -= 360
 
         self.pattern_params = {
-            'boresight_deg': round(effective_boresight),
+            'boresight_deg': boresight_deg,
             'beamwidth_deg': round(effective_beamwidth),
             'global_max_gain_db': self.lobes['global_max_gain_db'],
             'front_to_back_ratio_db': front_to_back_ratio_db,

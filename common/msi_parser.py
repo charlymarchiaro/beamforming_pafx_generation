@@ -18,13 +18,13 @@ class MsiParser:
 
         boresight_gain = self.get_boresight_gain(header['GAIN'])
         boresight_gain_unit = 'dBi'
-        horiz_beamwidth_deg = round(
-            self.get_header_pattern_width('horizontal', msi_data)
-            or horiz_gains_parser.get_pattern_width()
+        horiz_beamwidth_deg = (
+                self.get_header_pattern_width('horizontal', msi_data)
+                or horiz_gains_parser.get_pattern_width()
         )
-        vert_beamwidth_deg = round(
-            self.get_header_pattern_width('vertical', msi_data)
-            or vert_gains_parser.get_pattern_width()
+        vert_beamwidth_deg = (
+                self.get_header_pattern_width('vertical', msi_data)
+                or vert_gains_parser.get_pattern_width()
         )
         horiz_boresight_deg = horiz_gains_parser.get_pattern_boresight()
         vert_boresight_deg = vert_gains_parser.get_pattern_boresight()
