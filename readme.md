@@ -94,7 +94,7 @@ Existen dos tipos de extractores:
 #### 1. PatternNameParamExtractor
 
 > Extrae el parámetro de la ruta completa del archivo de pattern. Tiene los siguientes argumentos de configuración:
-> - **extract_re:** Expresión regular que captura un valor usando un grupo de captura con nombre <cg>.
+> - **extract_re:** Expresión regular que captura un valor usando un grupo de captura con nombre **&lt;cg&gt;**.
     Ejemplo: ```.*_(?P<cg>-?\d+)T_.*```. Documentación de
     python: https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups
 > - **path_part:** Parte de la ruta de archivo que usaremos. Puede ser ***full*** (por defecto, ruta completa),
