@@ -82,20 +82,26 @@ Los parámetros de configuración tienen el siguiente formato:
     'horiz_sep_dist_cm_extractor': ParamExtractor,
     'vert_number_of_elements_extractor': ParamExtractor,
     'vert_sep_dist_cm_extractor': ParamExtractor,
+    
+    # ------------------------------------------------------------------
+    # Selectores de parámetros
+    # ------------------------------------------------------------------
+    'scenario_selector': ParamSelector,
+    'v_port_name_selector': ParamSelector,
 }
 ```
 
-#### Parámetros generales:
+### Parámetros generales:
 
-No están incluidos dentro de los archivos de patterns, por lo que deben solicitarse al proveedor
+No están incluidos dentro de los archivos de patterns, por lo que deben solicitarse al proveedor.
 
-#### Filtro general (allow/deny) de archivos de patterns a considerar:
+### Filtro general (allow/deny) de archivos de patterns a considerar:
 
 Es un filtro versátil que soporta múltiples condiciones de whitelist y de blacklist usando expresiones regulares.
 Permite hacer un filtro general inicial para quedarse únicamente con los archivos de pattern que formarán parte del
 modelo final.
 
-#### Extractores de parámetros:
+### Extractores de parámetros:
 
 Cada extractor tiene como función obtener para cada pattern un parámetro específico: nombre, scenario, nombre de virtual
 port, frecuencias, tilt eléctrico, etc.
@@ -141,6 +147,23 @@ Existen dos tipos de extractores:
 >     step: int
 >     gains: list[float]
 > ```
+
+### Selectores de parámetros:
+
+Cuando no es posible extraer un parámetro de un pattern, o bien es necesario asignar el mismo pattern a múltiples
+valores de un mismo parámetro, recurrimos a los selectores de parámetros *(Ej: cuando un mismo pattern de Beamforming
+Element debe aplicarse por igual a todos los scenarios y virtual ports de la antena)*.
+
+Existe un único tipo de selectores:
+
+#### 1. PatternNameParamSelector
+
+> Proporciona una lógica de selección de valores basado en la ruta completa del archivo de pattern. Tiene los siguientes
+> argumentos de configuración:
+> - **select_re:** Función que, dado un nombre de archivo de pattern, devuelve una expresión regular que selecciona cero
+    o más valores de entre los previamente extraídos de los demás patterns para el parámetro en cuestión.
+> - **pre_capture_proc:** Función que transforma opcionalmente cada valor del parámetro antes de evaluar el regex de
+    selección.
 
 ### Generación del modelo .pafx usando Jupyter Notebooks
 
