@@ -19,13 +19,14 @@ class PatternPayloadParamExtractor:
     def extract(self, payload: MsiData) -> str | int | float | None:
         try:
             param = self.extract_fn(payload)
-        except:
+        except Exception as e:
             print(
                 '[ERROR] Error extracting param from pattern payload. Source file: '
                 + payload.src_file
                 + ', payload: '
                 + str(payload)
             )
+            print(e)
             return None
 
         return param
