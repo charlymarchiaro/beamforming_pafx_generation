@@ -5,7 +5,7 @@ from zipfile import ZipFile
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
 from .msi_data import PapPatternData
-from .consts import PATTERN_TYPE__BROADCAST, PATTERN_TYPE__BEAMFORMING_ELEMENT
+from .consts import PATTERN_TYPE__BROADCAST, PATTERN_TYPE__BEAMFORMING_ELEMENT, COMMENT_FINGERPRINT
 
 
 def xml_bool(value: bool) -> str:
@@ -93,7 +93,7 @@ class PafxFileWriter:
         type_se.text = str(params['type'])
 
         comment_se = ET.SubElement(antenna_model_se, 'Comment')
-        comment_se.text = str(params['comment'])
+        comment_se.text = COMMENT_FINGERPRINT + ' - ' + str(params['comment'])
 
         manufacturer_se = ET.SubElement(antenna_model_se, 'Manufacturer')
         manufacturer_se.text = str(params['manufacturer'])
