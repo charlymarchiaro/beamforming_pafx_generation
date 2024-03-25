@@ -254,12 +254,16 @@ class BeamformingAntennaGenerator:
         print('')
         print(f'[{tag}]:')
         key_index_digits = int_digits(len(d.keys()))
-        for i, key in enumerate(d.keys()):
+        keys = list(d.keys())
+        keys.sort()
+        for i, key in enumerate(keys):
             key_index_str = str(i + 1).rjust(key_index_digits)
             print(f"  {key_index_str}. [{key}] ({len(d[key])} items):")
 
             item_index_digits = int_digits(len(d[key]))
-            for j, item in enumerate(d[key]):
+            items = d[key]
+            items.sort()
+            for j, item in enumerate(items):
                 item_index_str = str(j + 1).rjust(item_index_digits)
                 print(f"    {item_index_str}.  {item}")
 
@@ -269,7 +273,9 @@ class BeamformingAntennaGenerator:
         print(f'[{tag}]:')
         index_digits = int_digits(len(d.keys()))
         max_key_length = max([len(str(key)) for key in list(d.keys())])
-        for i, key in enumerate(d.keys()):
+        keys = list(d.keys())
+        keys.sort()
+        for i, key in enumerate(keys):
             count = d[key]
             index_str = str(i + 1).rjust(index_digits)
             print(f"  {index_str}.  {str(key).ljust(max(max_key_length, 20), '.')}....{count} items")
