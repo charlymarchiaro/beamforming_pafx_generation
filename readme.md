@@ -83,6 +83,7 @@ Los parámetros de configuración tienen el siguiente formato:
     'vert_number_of_elements_extractor': ParamExtractor,
     'vert_sep_dist_cm_extractor': ParamExtractor,
     
+    
     # ------------------------------------------------------------------
     # Selectores de parámetros
     # ------------------------------------------------------------------
