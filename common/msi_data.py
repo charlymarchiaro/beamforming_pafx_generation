@@ -7,7 +7,7 @@ class PapPatternData:
     start_angle: int
     end_angle: int
     step: int
-    gains: list[float]
+    gains: str
 
     def __str__(self):
         return self.to_json()
