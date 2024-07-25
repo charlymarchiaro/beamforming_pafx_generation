@@ -2,7 +2,7 @@ import math
 import os
 from .consts import PATTERN_FILE_FORMAT__MSI
 from .util.util import int_digits
-from .msi_data import MsiData
+from .pattern_data import MsiData
 from .msi_parser import MsiParser
 from .pattern_name_param_extractor import PatternNameParamExtractor
 from .pattern_payload_param_extractor import PatternPayloadParamExtractor

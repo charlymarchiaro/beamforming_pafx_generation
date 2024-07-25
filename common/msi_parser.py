@@ -2,7 +2,7 @@ import re
 
 from .pattern_gains_parser import PatternGainsParser
 
-from .msi_data import MsiData
+from .pattern_data import MsiData
 
 
 class MsiParser:

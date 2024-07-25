@@ -16,6 +16,17 @@ class PapPatternData:
         return json.dumps(self, default=lambda o: o.__dict__)
 
 
+class PapData:
+    horiz_pap_pattern: PapPatternData
+    vert_pap_pattern: PapPatternData
+
+    def __str__(self):
+        return self.to_json()
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__, indent=2)
+
+
 class MsiData:
     src_file: str
     header: dict
@@ -33,4 +44,4 @@ class MsiData:
         return self.to_json()
 
     def to_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        return json.dumps(self, default=lambda o: o.__dict__, indent=2)

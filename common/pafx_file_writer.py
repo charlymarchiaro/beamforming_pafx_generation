@@ -4,7 +4,7 @@ import tempfile
 from zipfile import ZipFile
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
-from .msi_data import PapPatternData
+from .pattern_data import PapPatternData
 from .consts import PATTERN_TYPE__BROADCAST, PATTERN_TYPE__BEAMFORMING_ELEMENT, COMMENT_FINGERPRINT
 
 

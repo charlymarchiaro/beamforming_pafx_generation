@@ -1,7 +1,7 @@
 from math import sin, cos, pi
 import collections
 
-from .msi_data import PapPatternData
+from .pattern_data import PapPatternData
 from .geom.vector_2d import Vector2d
 from .geom.geom import are_vectors2d_on_same_half_plane, get_angle_range_boundaries
 

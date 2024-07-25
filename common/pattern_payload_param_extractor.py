@@ -1,5 +1,5 @@
 from typing import Callable
-from .msi_data import MsiData
+from .pattern_data import MsiData
 
 
 class PatternPayloadParamExtractor:
