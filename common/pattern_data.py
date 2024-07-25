@@ -1,4 +1,5 @@
 import json
+import math
 
 
 class PapPatternData:
@@ -14,6 +15,21 @@ class PapPatternData:
 
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+
+    def get_boresight_deg(self, min_gain_db = -5.0) -> int:
+        gains = [float(g) for g in self.gains.split(';')]
+        angles = [a for a in range(self.start_angle, self.end_angle + self.step, self.step)]
+        weighted_avg_angle_num = 0
+        weighted_avg_angle_denom = 0
+
+        for i, g in enumerate(gains):
+            if g >= min_gain_db:
+                angle = angles[i]
+                gain_linear = math.pow(10, g / 10.0)
+                weighted_avg_angle_num += gain_linear * angle
+                weighted_avg_angle_denom += gain_linear
+        # return weighted average angle
+        return int(weighted_avg_angle_num / weighted_avg_angle_denom)
 
 
 class PapData:
