@@ -59,6 +59,8 @@ class MsiParser:
 
         section = 'header'
         for line in lines:
+            if str.isspace(line) or line is None or line == '':
+                continue
             r = self.parse_msi_line(line)
             key = r['key']
             value = r['value']
@@ -107,7 +109,7 @@ class MsiParser:
 
     @staticmethod
     def get_boresight_gain(value):
-        parts = value.split(' ')
+        parts = value.split()
         gain = float(parts[0])
         unit = parts[1].upper() if len(parts) > 0 else ''
         gain = gain + 2.15 if unit == 'DBD' else gain
