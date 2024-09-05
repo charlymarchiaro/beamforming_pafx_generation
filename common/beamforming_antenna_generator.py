@@ -60,7 +60,6 @@ class BeamformingAntennaGenerator:
         beamswitching_beam_id_extractor = self.params['beamswitching_beam_id_extractor']
         beamswitching_horiz_angle_extractor = self.params['beamswitching_horiz_angle_extractor']
         beamswitching_vert_angle_extractor = self.params['beamswitching_vert_angle_extractor']
-        beamswitching_pattern_name_extractor = self.params['beamswitching_pattern_name_extractor']
 
         # selectors
         scenario_selector: PatternNameParamSelector | None = self.params['scenario_selector']
@@ -105,10 +104,10 @@ class BeamformingAntennaGenerator:
                 'beamswitching_service_name': self.extract_param(beamswitching_service_name_extractor, src_file,
                                                                  payload),
                 'beamswitching_beam_id': self.extract_param(beamswitching_beam_id_extractor, src_file, payload),
-                'beamswitching_horiz_angle': round(self.extract_param(beamswitching_horiz_angle_extractor, src_file, payload), 1),
-                'beamswitching_vert_angle': round(self.extract_param(beamswitching_vert_angle_extractor, src_file, payload), 1),
-                'beamswitching_pattern_name': self.extract_param(beamswitching_pattern_name_extractor, src_file,
-                                                                 payload),
+                'beamswitching_horiz_angle': round(
+                    self.extract_param(beamswitching_horiz_angle_extractor, src_file, payload), 1),
+                'beamswitching_vert_angle': round(
+                    self.extract_param(beamswitching_vert_angle_extractor, src_file, payload), 1),
                 'boresight_gain': payload.boresight_gain,
                 'boresight_gain_unit': payload.boresight_gain_unit,
                 'horiz_beamwidth_deg': payload.horiz_beamwidth_deg,
@@ -162,7 +161,6 @@ class BeamformingAntennaGenerator:
         beamswitching_beam_id = {}
         beamswitching_horiz_angle = {}
         beamswitching_vert_angle = {}
-        beamswitching_pattern_name = {}
 
         for pattern in self.patterns:
             if detailed:
@@ -189,7 +187,6 @@ class BeamformingAntennaGenerator:
                 self.push_dict_item(pattern['beamswitching_beam_id'], beamswitching_beam_id, value)
                 self.push_dict_item(pattern['beamswitching_horiz_angle'], beamswitching_horiz_angle, value)
                 self.push_dict_item(pattern['beamswitching_vert_angle'], beamswitching_vert_angle, value)
-                self.push_dict_item(pattern['beamswitching_pattern_name'], beamswitching_pattern_name, value)
             else:
                 # scenario
                 for pattern_scenario in [pattern['scenario']] + pattern['selected_scenarios']:
@@ -213,7 +210,6 @@ class BeamformingAntennaGenerator:
                 self.increment_dict_item(pattern['beamswitching_beam_id'], beamswitching_beam_id)
                 self.increment_dict_item(pattern['beamswitching_horiz_angle'], beamswitching_horiz_angle)
                 self.increment_dict_item(pattern['beamswitching_vert_angle'], beamswitching_vert_angle)
-                self.increment_dict_item(pattern['beamswitching_pattern_name'], beamswitching_pattern_name)
 
         extracted_tags = {
             'scenario': scenario,
@@ -232,7 +228,6 @@ class BeamformingAntennaGenerator:
             'beamswitching_beam_id': beamswitching_beam_id,
             'beamswitching_horiz_angle': beamswitching_horiz_angle,
             'beamswitching_vert_angle': beamswitching_vert_angle,
-            'beamswitching_pattern_name': beamswitching_pattern_name,
         }
         if log:
             print('')
