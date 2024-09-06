@@ -5,7 +5,8 @@ from zipfile import ZipFile
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
 from .pattern_data import PapPatternData
-from .consts import PATTERN_TYPE__BROADCAST, PATTERN_TYPE__BEAMFORMING_ELEMENT, COMMENT_FINGERPRINT
+from .consts import PATTERN_TYPE__BROADCAST, PATTERN_TYPE__BEAMFORMING_ELEMENT, PATTERN_TYPE__BEAMSWITCHING_SERVICE, \
+    COMMENT_FINGERPRINT
 
 
 def xml_bool(value: bool) -> str:
@@ -211,6 +212,7 @@ class PafxFileWriter:
             v_band_name = str(min_freq) + '-' + str(max_freq)
             pattern_type = pattern['pattern_type']
             pattern_name = pattern['name']
+            beamswitching_service_name = pattern['beamswitching_service_name']
 
             # if any extracted param is missing, the pattern cannot yet be assigned;>
             # it must be assigned considering selected params in the next loop
@@ -226,7 +228,7 @@ class PafxFileWriter:
                     'vert_number_of_elements': pattern['vert_number_of_elements'],
                     'vert_sep_dist_cm': pattern['vert_sep_dist_cm'],
                     'v_ports': {},
-                    'is_beamswitching': False,
+                    'is_beamswitching': True,
                 }
             if v_port_name not in scenarios[scenario]['v_ports']:
                 scenarios[scenario]['v_ports'][v_port_name] = {
@@ -247,9 +249,9 @@ class PafxFileWriter:
                     'cont_adj_elec_tilt': params['cont_adj_elec_tilt'],
                     'broadcast_patterns': [],
                     'electrical_controller_name': elec_controllers_dict[0]['name'],
-                    'use_elec_params_for_bs_service_patterns': False,
+                    'use_elec_params_for_bs_service_patterns': True,
                     'beamforming_element_patterns': [],
-                    'beamswitching_service_patterns': [],
+                    'beamswitching_service_patterns': {},
                 }
             v_band = scenarios[scenario]['v_ports'][v_port_name]['v_bands'][v_band_name]
 
@@ -257,6 +259,14 @@ class PafxFileWriter:
                 v_band['broadcast_patterns'].append(pattern_name)
             if pattern_type == PATTERN_TYPE__BEAMFORMING_ELEMENT:
                 v_band['beamforming_element_patterns'].append(pattern_name)
+            if pattern_type == PATTERN_TYPE__BEAMSWITCHING_SERVICE:
+                if beamswitching_service_name not in v_band['beamswitching_service_patterns']:
+                    v_band['beamswitching_service_patterns'][beamswitching_service_name] = []
+                v_band['beamswitching_service_patterns'][beamswitching_service_name].append({
+                    'horiz_angle': pattern['beamswitching_horiz_angle'],
+                    'vert_angle': pattern['beamswitching_vert_angle'],
+                    'pattern_name': pattern_name,
+                })
 
         # assign selected params
         for pattern in patterns:
@@ -270,6 +280,7 @@ class PafxFileWriter:
             v_band_name = str(min_freq) + '-' + str(max_freq)
             pattern_type = pattern['pattern_type']
             pattern_name = pattern['name']
+            beamswitching_service_name = pattern['beamswitching_service_name']
 
             if len(selected_scenarios) == 0 and len(selected_v_port_names) == 0:
                 # No selected params --> ignore
@@ -302,6 +313,15 @@ class PafxFileWriter:
                             and pattern_name not in v_band['beamforming_element_patterns']
                     ):
                         v_band['beamforming_element_patterns'].append(pattern_name)
+
+                    if pattern_type == PATTERN_TYPE__BEAMSWITCHING_SERVICE:
+                        if beamswitching_service_name not in v_band['beamswitching_service_patterns']:
+                            v_band['beamswitching_service_patterns'][beamswitching_service_name] = []
+                        v_band['beamswitching_service_patterns'][beamswitching_service_name].append({
+                            'horiz_angle': pattern['beamswitching_horiz_angle'],
+                            'vert_angle': pattern['beamswitching_vert_angle'],
+                            'pattern_name': pattern_name,
+                        })
 
         # log assignments
         print()
@@ -414,9 +434,25 @@ class PafxFileWriter:
                         pattern_se = ET.SubElement(beamforming_element_patterns_se, 'string')
                         pattern_se.text = pattern
 
-                    for pattern in v_band['beamswitching_service_patterns']:
-                        pattern_se = ET.SubElement(beamswitching_service_patterns_se, 'string')
-                        pattern_se.text = pattern
+                    for beamswitching_service_name in v_band['beamswitching_service_patterns'].keys():
+                        beamswitching_service_pattern_se = ET.SubElement(beamswitching_service_patterns_se,
+                                                                         'BeamswitchingServicePattern')
+                        service_pattern_name_se = ET.SubElement(beamswitching_service_pattern_se, 'ServicePatternName')
+                        service_pattern_name_se.text = beamswitching_service_name
+                        service_patterns_se = ET.SubElement(beamswitching_service_pattern_se, 'ServicePatterns')
+
+                        beam_id_counter = 0
+                        for pattern in v_band['beamswitching_service_patterns'][beamswitching_service_name]:
+                            beamswitchting_pattern_se = ET.SubElement(service_patterns_se, 'BeamswitchingPattern')
+                            beam_id_se = ET.SubElement(beamswitchting_pattern_se, 'BeamID')
+                            beam_id_counter += 1
+                            beam_id_se.text = str(beam_id_counter)
+                            horiz_angle_se = ET.SubElement(beamswitchting_pattern_se, 'HorizontalAngle')
+                            horiz_angle_se.text = str(pattern['horiz_angle'])
+                            vert_angle_se = ET.SubElement(beamswitchting_pattern_se, 'VerticalAngle')
+                            vert_angle_se.text = str(pattern['vert_angle'])
+                            pattern_name_se = ET.SubElement(beamswitchting_pattern_se, 'BeamswitchingPatternName')
+                            pattern_name_se.text = pattern['pattern_name']
 
         xmlstr = minidom.parseString(ET.tostring(antenna_model_se)).toprettyxml(indent="  ", encoding="utf-8")
         with open(path, 'wb') as f:
