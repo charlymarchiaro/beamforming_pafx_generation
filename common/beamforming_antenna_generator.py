@@ -57,7 +57,6 @@ class BeamformingAntennaGenerator:
         vert_sep_dist_cm_extractor = self.params['vert_sep_dist_cm_extractor']
         v_port_number_of_ports_extractor = self.params['v_port_number_of_ports_extractor']
         beamswitching_service_name_extractor = self.params['beamswitching_service_name_extractor']
-        beamswitching_beam_id_extractor = self.params['beamswitching_beam_id_extractor']
         beamswitching_horiz_angle_extractor = self.params['beamswitching_horiz_angle_extractor']
         beamswitching_vert_angle_extractor = self.params['beamswitching_vert_angle_extractor']
 
@@ -103,7 +102,6 @@ class BeamformingAntennaGenerator:
                 'vert_sep_dist_cm': self.extract_param(vert_sep_dist_cm_extractor, src_file, payload),
                 'beamswitching_service_name': self.extract_param(beamswitching_service_name_extractor, src_file,
                                                                  payload),
-                'beamswitching_beam_id': self.extract_param(beamswitching_beam_id_extractor, src_file, payload),
                 'beamswitching_horiz_angle': round(
                     self.extract_param(beamswitching_horiz_angle_extractor, src_file, payload), 1),
                 'beamswitching_vert_angle': round(
@@ -158,7 +156,6 @@ class BeamformingAntennaGenerator:
         vert_number_of_elements = {}
         vert_sep_dist_cm = {}
         beamswitching_service_name = {}
-        beamswitching_beam_id = {}
         beamswitching_horiz_angle = {}
         beamswitching_vert_angle = {}
 
@@ -184,7 +181,6 @@ class BeamformingAntennaGenerator:
                 self.push_dict_item(pattern['vert_number_of_elements'], vert_number_of_elements, value)
                 self.push_dict_item(pattern['vert_sep_dist_cm'], vert_sep_dist_cm, value)
                 self.push_dict_item(pattern['beamswitching_service_name'], beamswitching_service_name, value)
-                self.push_dict_item(pattern['beamswitching_beam_id'], beamswitching_beam_id, value)
                 self.push_dict_item(pattern['beamswitching_horiz_angle'], beamswitching_horiz_angle, value)
                 self.push_dict_item(pattern['beamswitching_vert_angle'], beamswitching_vert_angle, value)
             else:
@@ -207,7 +203,6 @@ class BeamformingAntennaGenerator:
                 self.increment_dict_item(pattern['vert_number_of_elements'], vert_number_of_elements)
                 self.increment_dict_item(pattern['vert_sep_dist_cm'], vert_sep_dist_cm)
                 self.increment_dict_item(pattern['beamswitching_service_name'], beamswitching_service_name)
-                self.increment_dict_item(pattern['beamswitching_beam_id'], beamswitching_beam_id)
                 self.increment_dict_item(pattern['beamswitching_horiz_angle'], beamswitching_horiz_angle)
                 self.increment_dict_item(pattern['beamswitching_vert_angle'], beamswitching_vert_angle)
 
@@ -225,7 +220,6 @@ class BeamformingAntennaGenerator:
             'vert_number_of_elements': vert_number_of_elements,
             'vert_sep_dist_cm': vert_sep_dist_cm,
             'beamswitching_service_name': beamswitching_service_name,
-            'beamswitching_beam_id': beamswitching_beam_id,
             'beamswitching_horiz_angle': beamswitching_horiz_angle,
             'beamswitching_vert_angle': beamswitching_vert_angle,
         }
