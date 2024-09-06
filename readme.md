@@ -82,7 +82,9 @@ Los parámetros de configuración tienen el siguiente formato:
     'horiz_sep_dist_cm_extractor': ParamExtractor,
     'vert_number_of_elements_extractor': ParamExtractor,
     'vert_sep_dist_cm_extractor': ParamExtractor,
-    
+    'beamswitching_service_name_extractor': ParamExtractor,
+    'beamswitching_horiz_angle_extractor': ParamExtractor,
+    'beamswitching_vert_angle_extractor': ParamExtractor,
     
     # ------------------------------------------------------------------
     # Selectores de parámetros
