@@ -1,5 +1,6 @@
 import json
 import os.path
+from random import random
 import tempfile
 from zipfile import ZipFile
 from xml.dom import minidom
@@ -11,6 +12,10 @@ from .consts import PATTERN_TYPE__BROADCAST, PATTERN_TYPE__BEAMFORMING_ELEMENT, 
 
 def xml_bool(value: bool) -> str:
     return 'true' if value else 'false'
+
+
+def add_rand_noise(v: float) -> float:
+    return round(v + (random() - 0.5) / 50, 5)
 
 
 class PafxFileWriter:
@@ -263,8 +268,10 @@ class PafxFileWriter:
                 if beamswitching_service_name not in v_band['beamswitching_service_patterns']:
                     v_band['beamswitching_service_patterns'][beamswitching_service_name] = []
                 v_band['beamswitching_service_patterns'][beamswitching_service_name].append({
-                    'horiz_angle': pattern['beamswitching_horiz_angle'],
-                    'vert_angle': pattern['beamswitching_vert_angle'],
+                    # Add random noise to avoid Planet "same parameters" error
+                    'horiz_angle': add_rand_noise(pattern['beamswitching_horiz_angle']),
+                    # Add random noise to avoid Planet "same parameters" error
+                    'vert_angle': add_rand_noise(pattern['beamswitching_vert_angle']),
                     'pattern_name': pattern_name,
                 })
 
@@ -318,8 +325,10 @@ class PafxFileWriter:
                         if beamswitching_service_name not in v_band['beamswitching_service_patterns']:
                             v_band['beamswitching_service_patterns'][beamswitching_service_name] = []
                         v_band['beamswitching_service_patterns'][beamswitching_service_name].append({
-                            'horiz_angle': pattern['beamswitching_horiz_angle'],
-                            'vert_angle': pattern['beamswitching_vert_angle'],
+                            # Add random noise to avoid Planet "same parameters" error
+                            'horiz_angle': add_rand_noise(pattern['beamswitching_horiz_angle']),
+                            # Add random noise to avoid Planet "same parameters" error
+                            'vert_angle': add_rand_noise(pattern['beamswitching_vert_angle']),
                             'pattern_name': pattern_name,
                         })
 
